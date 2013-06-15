@@ -7,8 +7,6 @@ class Hermite(object):
         EXAMPLES::
 
             sage: her = Hermite(3,4)  
-            [[0, 0], [0, a + 1], [0, 2*a + 2], [a, 2*a], [a, a + 2], [a, 1], [a + 1, a], [a + 1, 2*a + 1], [a + 1, 2], [2*a + 1, 2*a], [2*a + 1, a + 2], [2*a + 1, 1], [2, a], [2, 2*a + 1], [2, 2], [2*a, 2*a], [2*a, a + 2], [2*a, 1], [2*a + 2, a], [2*a + 2, 2*a + 1], [2*a + 2, 2], [a + 2, 2*a], [a + 2, a + 2], [a + 2, 1], [1, a], [1, 2*a + 1], [1, 2]]
-
             sage: her.G # not tested
             sage: her.phi_her # not tested
             sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
@@ -42,8 +40,7 @@ class Hermite(object):
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
-        print self.points
-        #basis = [[el^i for el in alpha] for i in range(self.k)]
+        basis_poly = [[x^a, y^b] for a in range(q+1) for b in range(1+ceil(m/(q+1)))]    #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
         #self.G = matrix(basis)
         #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
         #self.C=self.V.subspace_with_basis(basis)
@@ -57,7 +54,7 @@ class Hermite(object):
             sage: her 
             (3,4)-Hermite-Code over Finite Field in a of size 3^2
         """
-        return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+"over"+str(self.field)
+        return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+" over "+str(self.field)
 
 
 
