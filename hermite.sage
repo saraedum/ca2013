@@ -1,57 +1,72 @@
+# /home/sage/sage/sage
+# %attach "/home/boerner/sage/hermite.sage"
+# run_doctests("/home/boerner/sage/hermite.sage")
 class Hermite(object):
-    def __init__(self,n,k,field,alpha):
+    def __init__(self,q,m):
         """
         EXAMPLES::
 
-            sage: l.<a> = GF(16) # not tested
-            sage: RS = ReedSolomon(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: RS.G # not tested
-            sage: RS.phi # not tested
-            sage: RS.V([a^(3*i) for i in range(5)]) in RS.C # not tested
+            sage: Her = Hermite(3,4)  
+            Finite Field in a of size 3^2
+            [[0, 0], [0, a + 1], [0, 2*a + 2], [a, 2*a], [a, a + 2], [a, 1], [a + 1, a], [a + 1, 2*a + 1], [a + 1, 2], [2*a + 1, 2*a], [2*a + 1, a + 2], [2*a + 1, 1], [2, a], [2, 2*a + 1], [2, 2], [2*a, 2*a], [2*a, a + 2], [2*a, 1], [2*a + 2, a], [2*a + 2, 2*a + 1], [2*a + 2, 2], [a + 2, 2*a], [a + 2, a + 2], [a + 2, 1], [1, a], [1, 2*a + 1], [1, 2]]
+
+            sage: Her.G # not tested
+            sage: Her.phiHer # not tested
+            sage: Her.V([a^(3*i) for i in range(5)]) in Her.C # not tested
             True
 
         """
+        n = q^3
         assert type(n) is sage.rings.integer.Integer
-        assert type(k) is sage.rings.integer.Integer
-        assert field.is_field()
-        self.n=n # test bla
-        self.k=k
+        assert type(m) is sage.rings.integer.Integer
+        self.n=n # Dimension of ...
+        self.k=m+1-(q^2-1)/2
+        self.q=q
+        field.<a>=GF(q^2)
         self.field=field
+        print field
         self.V=field^n
-        self.W=field^k
-        self.d=n-k+1
+        self.W=field^(self.k)
+        self.d=n-self.k+1
         self.t=floor((self.d-1)/2)
-        self.alpha=alpha
-        assert len(alpha)==n
-        assert [el.parent()==field for el in alpha] == [True]*n
-        basis = [[el^i for el in alpha] for i in range(k)]
-        self.G = matrix(basis)
-        self.phi=self.W.hom([x*self.G for x in self.W.basis()])
-        self.C=self.V.subspace_with_basis(basis)
+        R.<x,y>=PolynomialRing(self.field)
+        self.hermite_curve=x^(self.q+1)-y^(self.q)-y
+        self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
+        print self.points
+        #basis = [[el^i for el in alpha] for i in range(self.k)]
+        #self.G = matrix(basis)
+        #self.phiHer=self.W.hom([x*self.G for x in self.W.basis()])
+        #self.C=self.V.subspace_with_basis(basis)
 
 
     def __repr__(self):
         """
         EXAMPLES::
 
-            sage: l.<a> = GF(16) # not tested
-            sage: RS = ReedSolomon(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: RS # not tested
-            (5,3)-RS-Code
+            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: Her # not tested
+            (5,3)-Her-Code
         """
-        return "("+str(self.n)+","+str(self.k)+")-RS-Code"
+        return "("+str(self.n)+","+str(self.k)+")-Her-Code"
 
+
+
+        
+
+        
+        
+        
 
     def w2pk(self,w):
         """
         EXAMPLES::
 
             sage: l.<a> = GF(16) # not tested
-            sage: RS = ReedSolomon(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: RS.w2pk(RS.W([0,0,1])) # not tested
+            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: Her.w2pk(Her.W([0,0,1])) # not tested
             x^2
         """
-        R.<x>=PolynomialRing(self.field)
+        R.<x,y>=PolynomialRing(self.field)
         return R(w.list())
 
     def encode(self,w):
@@ -59,23 +74,23 @@ class Hermite(object):
         EXAMPLES::
 
             sage: l.<a> = GF(16) # not tested
-            sage: RS = ReedSolomon(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: RS.phi(RS.W([0,0,1])) # not tested
+            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: Her.phiHer(Her.W([0,0,1])) # not tested
             (1, a^3 + a^2, a^3 + a^2 + a + 1, a^3, a^3 + a)
 
         """
 
-        return self.phi(w)
+        return self.phiHer(w)
 
     def find_codeword(self,r):
         """
         EXAMPLES::
 
             sage: l.<a> = GF(16) # not tested
-            sage: RS = ReedSolomon(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: RS.find_codeword(RS.V([0,1,0,a^3,1])) # not tested
+            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: Her.find_codeword(Her.V([0,1,0,a^3,1])) # not tested
             (0, 1, a^3 + a^2 + a + 1, a^3, 1)
-            sage: RS.find_codeword(RS.V([a,a^13,a^11,a^14,a^7])) # not tested
+            sage: Her.find_codeword(Her.V([a,a^13,a^11,a^14,a^7])) # not tested
             (0, a^3 + a^2 + 1, a^3 + a^2 + a, a^3 + 1, a^3 + a + 1)
         """
 
@@ -90,8 +105,8 @@ class Hermite(object):
         EXAMPLES::
 
             sage: l.<a> = GF(16) # not tested
-            sage: RS = ReedSolomon(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: RS.decode(RS.V([a,a^13,a^11,a^14,a^7])) # not tested
+            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: Her.decode(Her.V([a,a^13,a^11,a^14,a^7])) # not tested
             (1, 0, 1)
         """
-        return column_matrix(self.G)\self.find_codeword(RS.find_codeword(r))
+        return column_matrix(self.G)\self.find_codeword(Her.find_codeword(r))
