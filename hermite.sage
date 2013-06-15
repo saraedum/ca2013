@@ -53,8 +53,8 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: her = Hermite(3,4)# not tested
-            sage: her # not tested
+            sage: her = Hermite(3,4)
+            sage: her 
             (3,4)-Hermite-Code over Finite Field in a of size 3^2
         """
         return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+"over"+str(self.field)
