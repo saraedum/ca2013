@@ -14,7 +14,7 @@ class Hermite(object):
         assert type(n) is sage.rings.integer.Integer
         assert type(k) is sage.rings.integer.Integer
         assert field.is_field()
-        self.n=n
+        self.n=n # test bla
         self.k=k
         self.field=field
         self.V=field^n
