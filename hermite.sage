@@ -7,7 +7,6 @@ class Hermite(object):
         EXAMPLES::
 
             sage: her = Hermite(3,4)  
-            Finite Field in a of size 3^2
             [[0, 0], [0, a + 1], [0, 2*a + 2], [a, 2*a], [a, a + 2], [a, 1], [a + 1, a], [a + 1, 2*a + 1], [a + 1, 2], [2*a + 1, 2*a], [2*a + 1, a + 2], [2*a + 1, 1], [2, a], [2, 2*a + 1], [2, 2], [2*a, 2*a], [2*a, a + 2], [2*a, 1], [2*a + 2, a], [2*a + 2, 2*a + 1], [2*a + 2, 2], [a + 2, 2*a], [a + 2, a + 2], [a + 2, 1], [1, a], [1, 2*a + 1], [1, 2]]
 
             sage: her.G # not tested
@@ -18,6 +17,8 @@ class Hermite(object):
         """
         assert type(q) is sage.rings.integer.Integer
         assert type(m) is sage.rings.integer.Integer
+        self.m=m
+        self.q=q
         ## Parameters, cf. page 30
         self.n=q^3    # Length of Code
         self.k=m+1-(q^2-1)/2    # Dimension of Code
@@ -28,17 +29,15 @@ class Hermite(object):
         self.b_m=-666    # Maximum of b in x^ay^b in L(mP)
         if mod(q,2) == 0:
             self.sigma_q=(q-2)^2/8+1/2    # q = 2^k
-        else
+        else:
             self.sigma_q=(q-1)^2/8+1/2    # q=p^k for p prime, p>2
         self.ell=q*self.a_m+(q+1)*self.b_m-m   
         ##        
-        self.q=q
         field.<a>=GF(q^2)
         self.field=field
-        print field
-        self.V=field^n
+        self.V=field^self.n
         self.W=field^(self.k)
-        self.d=n-self.k+1
+        self.d=self.n-self.k+1
         self.t=floor((self.d-1)/2)
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
@@ -54,11 +53,11 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: her = Hermite(3,4)# not tested
             sage: her # not tested
-            (5,3)-her-Code
+            (3,4)-Hermite-Code over Finite Field in a of size 3^2
         """
-        return "("+str(self.n)+","+str(self.k)+")-her-Code"
+        return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+"over"+str(self.field)
 
 
 
