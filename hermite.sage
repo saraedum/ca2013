@@ -6,13 +6,13 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: Her = Hermite(3,4)  
+            sage: her = Hermite(3,4)  
             Finite Field in a of size 3^2
             [[0, 0], [0, a + 1], [0, 2*a + 2], [a, 2*a], [a, a + 2], [a, 1], [a + 1, a], [a + 1, 2*a + 1], [a + 1, 2], [2*a + 1, 2*a], [2*a + 1, a + 2], [2*a + 1, 1], [2, a], [2, 2*a + 1], [2, 2], [2*a, 2*a], [2*a, a + 2], [2*a, 1], [2*a + 2, a], [2*a + 2, 2*a + 1], [2*a + 2, 2], [a + 2, 2*a], [a + 2, a + 2], [a + 2, 1], [1, a], [1, 2*a + 1], [1, 2]]
 
-            sage: Her.G # not tested
-            sage: Her.phiHer # not tested
-            sage: Her.V([a^(3*i) for i in range(5)]) in Her.C # not tested
+            sage: her.G # not tested
+            sage: her.phi_her # not tested
+            sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
             True
 
         """
@@ -46,7 +46,7 @@ class Hermite(object):
         print self.points
         #basis = [[el^i for el in alpha] for i in range(self.k)]
         #self.G = matrix(basis)
-        #self.phiHer=self.W.hom([x*self.G for x in self.W.basis()])
+        #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
         #self.C=self.V.subspace_with_basis(basis)
 
 
@@ -54,11 +54,11 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: Her # not tested
-            (5,3)-Her-Code
+            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: her # not tested
+            (5,3)-her-Code
         """
-        return "("+str(self.n)+","+str(self.k)+")-Her-Code"
+        return "("+str(self.n)+","+str(self.k)+")-her-Code"
 
 
 
@@ -73,8 +73,8 @@ class Hermite(object):
         EXAMPLES::
 
             sage: l.<a> = GF(16) # not tested
-            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: Her.w2pk(Her.W([0,0,1])) # not tested
+            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: her.w2pk(her.W([0,0,1])) # not tested
             x^2
         """
         R.<x,y>=PolynomialRing(self.field)
@@ -85,23 +85,23 @@ class Hermite(object):
         EXAMPLES::
 
             sage: l.<a> = GF(16) # not tested
-            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: Her.phiHer(Her.W([0,0,1])) # not tested
+            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: her.phi_her(her.W([0,0,1])) # not tested
             (1, a^3 + a^2, a^3 + a^2 + a + 1, a^3, a^3 + a)
 
         """
 
-        return self.phiHer(w)
+        return self.phi_her(w)
 
     def find_codeword(self,r):
         """
         EXAMPLES::
 
             sage: l.<a> = GF(16) # not tested
-            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: Her.find_codeword(Her.V([0,1,0,a^3,1])) # not tested
+            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: her.find_codeword(her.V([0,1,0,a^3,1])) # not tested
             (0, 1, a^3 + a^2 + a + 1, a^3, 1)
-            sage: Her.find_codeword(Her.V([a,a^13,a^11,a^14,a^7])) # not tested
+            sage: her.find_codeword(her.V([a,a^13,a^11,a^14,a^7])) # not tested
             (0, a^3 + a^2 + 1, a^3 + a^2 + a, a^3 + 1, a^3 + a + 1)
         """
 
@@ -116,8 +116,8 @@ class Hermite(object):
         EXAMPLES::
 
             sage: l.<a> = GF(16) # not tested
-            sage: Her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: Her.decode(Her.V([a,a^13,a^11,a^14,a^7])) # not tested
+            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: her.decode(her.V([a,a^13,a^11,a^14,a^7])) # not tested
             (1, 0, 1)
         """
-        return column_matrix(self.G)\self.find_codeword(Her.find_codeword(r))
+        return column_matrix(self.G)\self.find_codeword(her.find_codeword(r))
