@@ -16,11 +16,22 @@ class Hermite(object):
             True
 
         """
-        n = q^3
-        assert type(n) is sage.rings.integer.Integer
+        assert type(q) is sage.rings.integer.Integer
         assert type(m) is sage.rings.integer.Integer
-        self.n=n # Dimension of ...
-        self.k=m+1-(q^2-1)/2
+        ## Parameters, cf. page 30
+        self.n=q^3    # Length of Code
+        self.k=m+1-(q^2-1)/2    # Dimension of Code
+        self.m_perp=self.n-self.m+q^2+q-2
+        self.k_perp=self.n-self.k    # dimension of L(m_perp P)
+        self.d_ast=self.n-self.m    # virtual minimal Distance
+        self.a_m=q
+        self.b_m=-666    # Maximum of b in x^ay^b in L(mP)
+        if mod(q,2) == 0:
+            self.sigma_q=(q-2)^2/8+1/2    # q = 2^k
+        else
+            self.sigma_q=(q-1)^2/8+1/2    # q=p^k for p prime, p>2
+        self.ell=q*self.a_m+(q+1)*self.b_m-m   
+        ##        
         self.q=q
         field.<a>=GF(q^2)
         self.field=field
