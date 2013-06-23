@@ -60,6 +60,21 @@ class Hermite(object):
             ret=max(ret,self.q*exp[0]+(self.q+1)*exp[1])
         return ret
 
+    def create_element(self,n):
+        """
+        EXAMPLES::
+            sage:her=Hermite(3,4)
+        """
+        assert type(n) is sage.rings.integer.Integer
+        R.<x,y>=self.field[]
+        max1=floor(n/self.q)
+        max2=floor(n/(self.q+1))
+        for a in range(max1+1):
+            for b in range(max2+1):
+                if self.ord(x^a*y^b)==n:
+                    return x^a*y^b
+        return 0
+
     def __repr__(self):
         """
         EXAMPLES::
