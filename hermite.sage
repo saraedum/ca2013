@@ -45,6 +45,20 @@ class Hermite(object):
         #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
         #self.C=self.V.subspace_with_basis(basis)
 
+    def ord(self,f):
+        """
+        EXAMPLES::
+            sage: her=Hermite(3,4)
+            sage: R.<x,y>=her.field[]
+            sage: f=x^2*y
+            sage: her.ord(f)
+            10
+        """
+        exps=f.exponents()
+        ret=0;
+        for exp in exps:
+            ret=max(ret,self.q*exp[0]+(self.q+1)*exp[1])
+        return ret
 
     def __repr__(self):
         """
@@ -55,14 +69,6 @@ class Hermite(object):
             (3,4)-Hermite-Code over Finite Field in a of size 3^2
         """
         return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+" over "+str(self.field)
-
-
-
-        
-
-        
-        
-        
 
     def w2pk(self,w):
         """
