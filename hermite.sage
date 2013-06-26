@@ -33,6 +33,8 @@ class Hermite(object):
         ##        
         field.<a>=GF(q^2)
         self.field=field
+        R.<x,y>=self.field[]
+        self.ring=R
         self.V=field^self.n
         self.W=field^(self.k)
         self.d=self.n-self.k+1
@@ -49,7 +51,7 @@ class Hermite(object):
         """
         EXAMPLES::
             sage: her=Hermite(3,4)
-            sage: R.<x,y>=her.field[]
+            sage: R=her.ring
             sage: f=x^2*y
             sage: her.ord(f)
             10
@@ -74,6 +76,9 @@ class Hermite(object):
                 if self.ord(x^a*y^b)==n:
                     return x^a*y^b
         return 0
+
+    def L(self,j):
+        return [self.create_element(i+1) for i in range(j) if self.create_element(i+1)!=0]
 
     def __repr__(self):
         """
