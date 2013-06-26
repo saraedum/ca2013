@@ -42,6 +42,7 @@ class Hermite(object):
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
+        #self.G=matrix([[self.create_element(Integer(i))(self.points[j]) for i in range(self.m+1)] for j in range(self.n)])
 
         basis_poly = [[x^a, y^b] for a in range(q+1) for b in range(1+ceil(m/(q+1)))]    #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
         #self.G = matrix(basis)
@@ -81,12 +82,12 @@ class Hermite(object):
         return 0
 
     def L(self,j):
-    """
-    EXAMPLES::
-        sage: her=Hermite(3,4)
-        sage: her.L(4)
-        [x,y]
-    """
+        """
+        EXAMPLES::
+            sage: her=Hermite(3,4)
+            sage: her.L(4)
+            [x,y]
+        """
         assert type(j) is sage.rings.integer.Integer
         return [self.create_element(i+1) for i in range(j) if self.create_element(i+1)!=0]
 
