@@ -42,8 +42,8 @@ class Hermite(object):
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
-        #self.G=matrix([[self.create_element(Integer(i))(self.points[j]) for i in range(self.m+1)] for j in range(self.n)])
-
+        #self.G=matrix([[self.create_element(Integer(i))(self.points[j]) for j in range(self.m+1)] for i in range(self.n) if self.create_element(Integer(i))!=0])
+        #self.H=matrix([[self.create_element(Integer(i))(self.points[j]) for j in range(self.m+1)] for i in range(self.n-self.k) if self.create_element(Integer(i))!=0])
         basis_poly = [[x^a, y^b] for a in range(q+1) for b in range(1+ceil(m/(q+1)))]    #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
         #self.G = matrix(basis)
         #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
@@ -53,7 +53,7 @@ class Hermite(object):
         """
         EXAMPLES::
             sage: her=Hermite(3,4)
-            sage: R=her.ring
+            sage: R.<x,y>=her.ring
             sage: f=x^2*y
             sage: her.ord(f)
             10
@@ -72,14 +72,18 @@ class Hermite(object):
             x
         """
         assert type(n) is sage.rings.integer.Integer
-        R.<x,y>=self.field[]
-        max1=floor(n/self.q)
-        max2=floor(n/(self.q+1))
-        for a in range(max1+1):
-            for b in range(max2+1):
-                if self.ord(x^a*y^b)==n:
-                    return x^a*y^b
-        return 0
+
+        R.<x,y>=self.ring
+        if n==0:
+            return 1
+        elif n%(self.q*(self.q+1))==0:
+            return x^(self.q)*y^(n/self.q)
+        else:
+            for a in range(self.q+1):
+                for b in range(self.q+2):
+                    if self.ord(x^a*y^b)==n:
+                        return x^a*y^b
+            return 0
 
     def L(self,j):
         """
