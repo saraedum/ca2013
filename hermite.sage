@@ -18,6 +18,9 @@ class Hermite(object):
         assert (q*q-q-1 <= m)    # Def. 3.7
         self.m=m
         self.q=q
+        field.<a>=GF(q^2)
+        self.field=field
+        R.<x,y>=self.field[]
         ## Parameters, cf. page 30
         self.n=q^3    # Length of Code
         self.k=m+1-(q^2-1)/2    # Dimension of Code
@@ -25,16 +28,16 @@ class Hermite(object):
         self.k_perp=self.n-self.k    # dimension of L(m_perp P)
         self.d_ast=self.n-self.m    # virtual minimal Distance
         self.a_m=q
-        self.b_m=-666    # Maximum of b in x^ay^b in L(mP)
+        self.basis_poly = [x^a*y^b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]
+        basis_poly_powers_of_y = [b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]        #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
+        self.b_m=max(basis_poly_powers_of_y)   # Maximum of b in x^ay^b in L(mP)
         if mod(q,2) == 0:
             self.sigma_q=(q-2)^2/8+1/2    # q = 2^k
         else:
             self.sigma_q=(q-1)^2/8+1/2    # q=p^k for p prime, p>2
         self.ell=q*self.a_m+(q+1)*self.b_m-m   
         ##        
-        field.<a>=GF(q^2)
-        self.field=field
-        R.<x,y>=self.field[]
+
         self.ring=R
         self.V=field^self.n
         self.W=field^(self.k)
@@ -45,7 +48,7 @@ class Hermite(object):
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
         self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n)) if self.element_exists(i)])
         self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n-self.k)) if self.element_exists(i)])
-        self.basis_poly = [x^a*y^b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]    #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
+
         #self.G = matrix(basis)
         #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
         #self.C=self.V.subspace_with_basis(basis)
