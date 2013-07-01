@@ -14,6 +14,10 @@ class Hermite(object):
             46
             sage: her.d_ast                                                                                     
             13
+            sage: her.ell                                                                            
+            15
+            sage: her.b_m                                                                            
+            10
             sage: her.G # not tested
             sage: her.phi_her # not tested
             sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
@@ -35,8 +39,8 @@ class Hermite(object):
         self.k_perp=self.n-self.k    # dimension of L(m_perp P)
         self.d_ast=self.n-self.m    # virtual minimal Distance
         self.a_m=q
-        self.basis_poly = [x^a*y^b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]     # S. 19 
-        basis_poly_powers_of_y = [b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]   # S. 23  
+        self.basis_poly = [x^a*y^b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m )  ]     # S. 19 
+        basis_poly_powers_of_y = [b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m )]   # S. 23  
         self.b_m=max(basis_poly_powers_of_y)   # Maximum of b in x^ay^b in L(mP)
         if mod(q,2) == 0:
             self.sigma_q=(q-2)^2/8+1/2    # q = 2^k
@@ -49,7 +53,7 @@ class Hermite(object):
         self.V=field^self.n
         self.W=field^(self.k)
         self.d=self.n-self.k+1
-        self.t=floor((self.d-1)/2)
+        #self.t=floor((self.d-1)/2)
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
