@@ -6,7 +6,7 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: her = Hermite(3,4)  
+            sage: her = Hermite(3,5)  
             sage: her.G # not tested
             sage: her.phi_her # not tested
             sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
@@ -15,6 +15,7 @@ class Hermite(object):
         """
         assert type(q) is sage.rings.integer.Integer
         assert type(m) is sage.rings.integer.Integer
+        assert (q*q-q-1 <= m)    # Def. 3.7
         self.m=m
         self.q=q
         ## Parameters, cf. page 30
@@ -44,7 +45,7 @@ class Hermite(object):
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
         self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n)) if self.element_exists(i)])
         self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n-self.k)) if self.element_exists(i)])
-        basis_poly = [[x^a, y^b] for a in range(q+1) for b in range(1+ceil(m/(q+1)))]    #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
+        self.basis_poly = [x^a*y^b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]    #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
         #self.G = matrix(basis)
         #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
         #self.C=self.V.subspace_with_basis(basis)
@@ -146,17 +147,17 @@ class Hermite(object):
         """
         return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+" over "+str(self.field)
 
-    def w2pk(self,w):
-        """
-        EXAMPLES::
+    # def w2pk(self,w):
+        # """
+        # EXAMPLES::
 
-            sage: l.<a> = GF(16) # not tested
-            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: her.w2pk(her.W([0,0,1])) # not tested
-            x^2
-        """
-        R.<x,y>=PolynomialRing(self.field)
-        return R(w.list())
+            # sage: l.<a> = GF(16) # not tested
+            # sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            # sage: her.w2pk(her.W([0,0,1])) # not tested
+            # x^2
+        # """
+        # R.<x,y>=PolynomialRing(self.field)
+        # return R(w.list())
 
     def encode(self,w):
         """
