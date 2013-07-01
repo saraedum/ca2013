@@ -15,9 +15,9 @@ class Hermite(object):
             sage: her.d_ast                                                                                     
             13
             sage: her.ell                                                                            
-            15
+            12
             sage: her.b_m                                                                            
-            10
+            4
             sage: her.G # not tested
             sage: her.phi_her # not tested
             sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
@@ -35,18 +35,18 @@ class Hermite(object):
         ## Parameters, cf. page 30
         self.n=q^3    # Length of Code
         self.k=m+1-(q^2-q)/2    # Dimension of Code,    TYPO on PAGE 30
-        self.m_perp=self.n-self.m+q^2+q-2 
+        self.m_perp=self.n-self.m+q^2-q-2 
         self.k_perp=self.n-self.k    # dimension of L(m_perp P)
         self.d_ast=self.n-self.m    # virtual minimal Distance
         self.a_m=q
         self.basis_poly = [x^a*y^b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m )  ]     # S. 19 
-        basis_poly_powers_of_y = [b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m )]   # S. 23  
-        self.b_m=max(basis_poly_powers_of_y)   # Maximum of b in x^ay^b in L(mP)
+        basis_poly_powers_of_y = [b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m_perp )]   # S. 23  
+        self.b_m=max(basis_poly_powers_of_y)   # Maximum of b in x^ay^b in L(m_perp P)
         if mod(q,2) == 0:
             self.sigma_q=(q-2)^2/8+1/2    # q = 2^k
         else:
             self.sigma_q=(q-1)^2/8+1/2    # q=p^k for p prime, p>2
-        self.ell=q*self.a_m+(q+1)*self.b_m-m   
+        self.ell=q*self.a_m+(q+1)*self.b_m-self.m_perp-1   
         ##        
 
         self.ring=R
