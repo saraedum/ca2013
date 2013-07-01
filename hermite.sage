@@ -185,17 +185,29 @@ class Hermite(object):
         """
 
         return self.phi_her(w)
+        
+        
+        
+        
+    def error_values(self,error_loc):
+        """
+        EXAMPLES::
+            sage: her = Hermite(4,51) 
+            sage: her.error_values(1234)
+            got:  [[1, a], [1, a^2], [1, a + 1], [1, a^2 + 1], [a, a^3 + a^2]]
+
+
+        """
+        a=self.field.gen()
+        error_loc = [[1,a],[1,a^2],[1,a^4],[1,a^8],[a,a^6]]
+        print 'got: ', error_loc
+        
+        
 
     def find_codeword(self,r):
         """
         EXAMPLES::
 
-            sage: l.<a> = GF(16) # not tested
-            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: her.find_codeword(her.V([0,1,0,a^3,1])) # not tested
-            (0, 1, a^3 + a^2 + a + 1, a^3, 1)
-            sage: her.find_codeword(her.V([a,a^13,a^11,a^14,a^7])) # not tested
-            (0, a^3 + a^2 + 1, a^3 + a^2 + a, a^3 + 1, a^3 + a + 1)
         """
 
         for c in self.C:
