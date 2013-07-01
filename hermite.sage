@@ -5,8 +5,15 @@ class Hermite(object):
     def __init__(self,q,m):
         """
         EXAMPLES::
-
-            sage: her = Hermite(3,5)  
+            sage: her = Hermite(4,51) 
+            sage: her.n                                                                                         
+            64
+            sage: her.q                                                                                         
+            4
+            sage: her.k                                                                                         
+            46
+            sage: her.d_ast                                                                                     
+            13
             sage: her.G # not tested
             sage: her.phi_her # not tested
             sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
@@ -23,13 +30,13 @@ class Hermite(object):
         R.<x,y>=self.field[]
         ## Parameters, cf. page 30
         self.n=q^3    # Length of Code
-        self.k=m+1-(q^2-1)/2    # Dimension of Code
-        self.m_perp=self.n-self.m+q^2+q-2
+        self.k=m+1-(q^2-q)/2    # Dimension of Code,    TYPO on PAGE 30
+        self.m_perp=self.n-self.m+q^2+q-2 
         self.k_perp=self.n-self.k    # dimension of L(m_perp P)
         self.d_ast=self.n-self.m    # virtual minimal Distance
         self.a_m=q
-        self.basis_poly = [x^a*y^b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]
-        basis_poly_powers_of_y = [b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]        #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
+        self.basis_poly = [x^a*y^b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]     # S. 19 
+        basis_poly_powers_of_y = [b for a in range(q) for b in range(m) if ((q*a+(q+1)*b) <= m)]   # S. 23  
         self.b_m=max(basis_poly_powers_of_y)   # Maximum of b in x^ay^b in L(mP)
         if mod(q,2) == 0:
             self.sigma_q=(q-2)^2/8+1/2    # q = 2^k
@@ -56,7 +63,7 @@ class Hermite(object):
     def ord(self,f):
         """
         EXAMPLES::
-            sage: her=Hermite(3,4)
+            sage: her=Hermite(3,5)
             sage: R.<x,y>=her.ring
             sage: f=x^2*y
             sage: her.ord(f)
@@ -71,7 +78,7 @@ class Hermite(object):
     def create_element(self,n):
         """
         EXAMPLES::
-            sage: her=Hermite(3,4)
+            sage: her=Hermite(3,5)
             sage: her.create_element(3)
             x
             sage: her.create_element(17)
@@ -96,7 +103,7 @@ class Hermite(object):
     def element_exists(self,n):
         """
         EXAMPLES::
-            sage: her=Hermite(3,4)
+            sage: her=Hermite(3,5)
             sage: her.element_exists(2)
             False
             sage: her.element_exists(13)
@@ -117,7 +124,7 @@ class Hermite(object):
     def ord_element(self,n):
         """
         EXAMPLES::
-            sage: her=Hermite(3,4)
+            sage: her=Hermite(3,5)
             sage: her.ord_element(4)
             6
         """
@@ -133,7 +140,7 @@ class Hermite(object):
     def L(self,j):
         """
         EXAMPLES::
-            sage: her=Hermite(3,4)
+            sage: her=Hermite(3,5)
             sage: her.L(13)
             [1, x, y, x^2, x*y, y^2, x^3, x^2*y, x*y^2, y^3, x^3*y]
         """
@@ -144,9 +151,9 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: her = Hermite(3,4)
+            sage: her = Hermite(3,5)
             sage: her 
-            (3,4)-Hermite-Code over Finite Field in a of size 3^2
+            (3,5)-Hermite-Code over Finite Field in a of size 3^2
         """
         return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+" over "+str(self.field)
 
