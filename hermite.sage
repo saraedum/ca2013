@@ -42,8 +42,8 @@ class Hermite(object):
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
-        #self.G=matrix([[self.create_element(Integer(i))(self.points[j]) for j in range(self.m+1)] for i in range(self.n) if self.create_element(Integer(i))!=0])
-        #self.H=matrix([[self.create_element(Integer(i))(self.points[j]) for j in range(self.m+1)] for i in range(self.n-self.k) if self.create_element(Integer(i))!=0])
+        self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n)) if self.element_exists(i)])
+        self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n-self.k)) if self.element_exists(i)])
         basis_poly = [[x^a, y^b] for a in range(q+1) for b in range(1+ceil(m/(q+1)))]    #  vgl. S. 17 f., Def. 3.1 Lemma 3.5
         #self.G = matrix(basis)
         #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
@@ -70,30 +70,71 @@ class Hermite(object):
             sage: her=Hermite(3,4)
             sage: her.create_element(3)
             x
+            sage: her.create_element(17)
+            x^3*y^2
         """
-        assert type(n) is sage.rings.integer.Integer
-
+        assert type(n) is sage.rings.integer.Integer or n in ZZ
         R.<x,y>=self.ring
-        if n==0:
-            return 1
-        elif n%(self.q*(self.q+1))==0:
-            return x^(self.q)*y^(n/self.q)
+        if self.element_exists(n):
+            if n==0:
+                return R.one()
+            else:
+                a=-n%(self.q+1)
+                b=n%self.q
+                if n<(self.q*(self.q+1)):
+                    return x^a*y^b
+                else:
+                    b=(n-self.q*a)/(self.q+1)
+                    return x^a*y^b
         else:
-            for a in range(self.q+1):
-                for b in range(self.q+2):
-                    if self.ord(x^a*y^b)==n:
-                        return x^a*y^b
-            return 0
+            return R.zero()
+
+    def element_exists(self,n):
+        """
+        EXAMPLES::
+            sage: her=Hermite(3,4)
+            sage: her.element_exists(2)
+            False
+            sage: her.element_exists(13)
+            True
+        """
+        assert type(n) is sage.rings.integer.Integer or n in ZZ
+        if n>=(self.q*(self.q+1)):
+            return True
+        else:
+            R.<x,y>=self.ring
+            a=-n%(self.q+1)
+            b=n%self.q
+            if self.ord(x^a*y^b)==n:
+                return True
+            else:
+                return False
+
+    def ord_element(self,n):
+        """
+        EXAMPLES::
+            sage: her=Hermite(3,4)
+            sage: her.ord_element(4)
+            6
+        """
+        assert type(n) is sage.rings.integer.Integer or n in ZZ
+        ret=0
+        i=0
+        while i<n:
+            if self.element_exists(ret):
+                i+=1
+            ret+=1
+        return ret-1
 
     def L(self,j):
         """
         EXAMPLES::
             sage: her=Hermite(3,4)
-            sage: her.L(4)
-            [x,y]
+            sage: her.L(13)
+            [1, x, y, x^2, x*y, y^2, x^3, x^2*y, x*y^2, y^3, x^3*y]
         """
-        assert type(j) is sage.rings.integer.Integer
-        return [self.create_element(i+1) for i in range(j) if self.create_element(i+1)!=0]
+        assert type(j) is sage.rings.integer.Integer or j in ZZ
+        return [self.create_element(i) for i in range(j+1) if self.element_exists(i)]
 
     def __repr__(self):
         """
