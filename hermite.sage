@@ -192,15 +192,54 @@ class Hermite(object):
     def error_values(self,error_loc):
         """
         EXAMPLES::
-            sage: her = Hermite(4,51) 
-            sage: her.error_values(1234)
-            got:  [[1, a], [1, a^2], [1, a + 1], [1, a^2 + 1], [a, a^3 + a^2]]
+            sage: her = Hermite(2,3) 
+            sage: her.error_values(1234) # not tested
+            got:  [[5, a, a^2], [6, a^2, a]]
+
 
 
         """
         a=self.field.gen()
-        error_loc = [[1,a],[1,a^2],[1,a^4],[1,a^8],[a,a^6]]
+        error_loc = [[5,a,a^2],[6,a^2,a]]
         print 'got: ', error_loc
+        
+        Ring.<x,y>=self.ring
+        S=x*y+x*x+y
+        LL=y+x+1
+        R=x^2+y+1
+        
+        u=[[0,0]]*len(self.points)
+        e=[0]*len(self.points)
+
+        print e
+        print error_loc[0][0]
+        list= [error_loc[j][0] for j in range(len(error_loc))]
+        for i in  range(len(error_loc)):
+            # #u[error_loc[i][0]][0] = y^(self.q)+y-(error_loc[i][1])^((self.q)+1)
+            # #u[error_loc[i][0]][1] = (x-error_loc[i][1])*(y-error_loc[i][2])
+            # print 'Position: ', error_loc[i][0]
+             f=R/error_loc[i][2]^(self.b_m+1)
+             print 'f= ', f
+             print 'f P', f(error_loc[i][1],error_loc[i][2])
+             print 'f R', R(error_loc[i][1],error_loc[i][2])
+             print error_loc[i]
+             print e
+             g=(x-error_loc[i][1])/LL
+             print 'LL(x): ', LL(x,error_loc[i][2])
+             print '(x-alph)/LL: ', (x-error_loc[i][1])/LL
+             gg=g(x,error_loc[i][2])
+             
+             print 'gg: ', gg
+             e[list[i]]=f(error_loc[i][1],error_loc[i][2])*gg
+             print e
+             print R(error_loc[i][1],error_loc[i][2])
+        #print u
+        print e
+        
+
+        
+        
+        
         
         
 
