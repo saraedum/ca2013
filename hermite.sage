@@ -18,7 +18,8 @@ class Hermite(object):
             12
             sage: her.b_m                                                                            
             4
-            sage: her.G # not tested
+            sage: her.G 
+            51 x 64 dense matrix over Finite Field in a of size 2^4
             sage: her.phi_her # not tested
             sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
             True
@@ -57,8 +58,8 @@ class Hermite(object):
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
-        self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n)) if self.element_exists(i)])
-        self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n-self.k)) if self.element_exists(i)])
+        self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.m)+1) if self.element_exists(i)])
+        self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.n-self.k)+1) if self.element_exists(i)])
 
         #self.G = matrix(basis)
         #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
