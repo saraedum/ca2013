@@ -19,7 +19,7 @@ class Hermite(object):
             sage: her.b_m                                                                            
             4
             sage: her.G 
-            51 x 64 dense matrix over Finite Field in a of size 2^4
+            46 x 64 dense matrix over Finite Field in a of size 2^4
             sage: her.phi_her # not tested
             sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
             True
@@ -48,22 +48,19 @@ class Hermite(object):
         else:
             self.sigma_q=(q-1)^2/8+1/2    # q=p^k for p prime, p>2
         self.ell=q*self.a_m+(q+1)*self.b_m-self.m_perp-1   
-        ##        
-
         self.ring=R
         self.V=field^self.n
         self.W=field^(self.k)
         self.d=self.n-self.k+1
-        #self.t=floor((self.d-1)/2)
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
-        self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.m)+1) if self.element_exists(i)])
-        self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.n-self.k)+1) if self.element_exists(i)])
-
-        #self.G = matrix(basis)
-        #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
-        #self.C=self.V.subspace_with_basis(basis)
+        assert self.n==len(self.points)
+        self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.k+1)) if self.element_exists(i)])
+        self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.n-self.k+1)) if self.element_exists(i)])
+        self.phi=self.W.hom(self.G)
+        assert self.G*self.H.transpose()==0
+        self.C=self.V.subspace_with_basis(self.G)
 
     def ord(self,f):
         """
@@ -162,33 +159,16 @@ class Hermite(object):
         """
         return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+" over "+str(self.field)
 
-    # def w2pk(self,w):
-        # """
-        # EXAMPLES::
-
-            # sage: l.<a> = GF(16) # not tested
-            # sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            # sage: her.w2pk(her.W([0,0,1])) # not tested
-            # x^2
-        # """
-        # R.<x,y>=PolynomialRing(self.field)
-        # return R(w.list())
-
     def encode(self,w):
         """
         EXAMPLES::
 
-            sage: l.<a> = GF(16) # not tested
-            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            sage: her = Hermite(3,5)
             sage: her.phi_her(her.W([0,0,1])) # not tested
-            (1, a^3 + a^2, a^3 + a^2 + a + 1, a^3, a^3 + a)
-
+            (0, a + 1, 2*a + 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2)
         """
 
         return self.phi_her(w)
-        
-        
-        
         
     def error_values(self,error_loc):
         """
