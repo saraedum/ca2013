@@ -5,21 +5,20 @@ class Hermite(object):
     def __init__(self,q,m):
         """
         EXAMPLES::
-            sage: her = Hermite(4,51) 
-            sage: her.n                                                                                         
+            sage: her = Hermite(4,51)
+            sage: her.n                                                                                        
             64
-            sage: her.q                                                                                         
+            sage: her.q                                                                                        
             4
-            sage: her.k                                                                                         
+            sage: her.k                                                                                        
             46
-            sage: her.d_ast                                                                                     
+            sage: her.d_ast                                                                                    
             13
-            sage: her.ell                                                                            
+            sage: her.ell                                                                           
             12
-            sage: her.b_m                                                                            
+            sage: her.b_m                                                                           
             4
-            sage: her.G 
-            46 x 64 dense matrix over Finite Field in a of size 2^4
+            sage: her.G # not tested
             sage: her.phi_her # not tested
             sage: her.V([a^(3*i) for i in range(5)]) in her.C # not tested
             True
@@ -36,31 +35,34 @@ class Hermite(object):
         ## Parameters, cf. page 30
         self.n=q^3    # Length of Code
         self.k=m+1-(q^2-q)/2    # Dimension of Code,    TYPO on PAGE 30
-        self.m_perp=self.n-self.m+q^2-q-2 
+        self.m_perp=self.n-self.m+q^2-q-2
         self.k_perp=self.n-self.k    # dimension of L(m_perp P)
         self.d_ast=self.n-self.m    # virtual minimal Distance
         self.a_m=q
-        self.basis_poly = [x^a*y^b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m )  ]     # S. 19 
-        basis_poly_powers_of_y = [b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m_perp )]   # S. 23  
+        self.basis_poly = [x^a*y^b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m )  ]     # S. 19
+        basis_poly_powers_of_y = [b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m_perp )]   # S. 23 
         self.b_m=max(basis_poly_powers_of_y)   # Maximum of b in x^ay^b in L(m_perp P)
         if mod(q,2) == 0:
             self.sigma_q=(q-2)^2/8+1/2    # q = 2^k
         else:
             self.sigma_q=(q-1)^2/8+1/2    # q=p^k for p prime, p>2
-        self.ell=q*self.a_m+(q+1)*self.b_m-self.m_perp-1   
+        self.ell=q*self.a_m+(q+1)*self.b_m-self.m_perp-1  
+        ##       
+
         self.ring=R
         self.V=field^self.n
         self.W=field^(self.k)
         self.d=self.n-self.k+1
+        #self.t=floor((self.d-1)/2)
         R.<x,y>=PolynomialRing(self.field)
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
-        self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
-        assert self.n==len(self.points)
-        self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.k+1)) if self.element_exists(i)])
-        self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.n-self.k+1)) if self.element_exists(i)])
-        self.phi=self.W.hom(self.G)
-        assert self.G*self.H.transpose()==0
-        self.C=self.V.subspace_with_basis(self.G)
+        self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0]
+        self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n)) if self.element_exists(i)])
+        self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.m+1)] for i in range(self.ord_element(self.n-self.k)) if self.element_exists(i)])
+
+        #self.G = matrix(basis)
+        #self.phi_her=self.W.hom([x*self.G for x in self.W.basis()])
+        #self.C=self.V.subspace_with_basis(basis)
 
     def ord(self,f):
         """
@@ -154,28 +156,54 @@ class Hermite(object):
         EXAMPLES::
 
             sage: her = Hermite(3,5)
-            sage: her 
+            sage: her
             (3,5)-Hermite-Code over Finite Field in a of size 3^2
         """
         return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+" over "+str(self.field)
+
+    # def w2pk(self,w):
+        # """
+        # EXAMPLES::
+
+            # sage: l.<a> = GF(16) # not tested
+            # sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
+            # sage: her.w2pk(her.W([0,0,1])) # not tested
+            # x^2
+        # """
+        # R.<x,y>=PolynomialRing(self.field)
+        # return R(w.list())
 
     def encode(self,w):
         """
         EXAMPLES::
 
-            sage: her = Hermite(3,5)
+            sage: l.<a> = GF(16) # not tested
+            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
             sage: her.phi_her(her.W([0,0,1])) # not tested
-            (0, a + 1, 2*a + 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2)
+            (1, a^3 + a^2, a^3 + a^2 + a + 1, a^3, a^3 + a)
+
         """
 
         return self.phi_her(w)
-        
+       
+    def uniformizer(self,x0,y0):
+        a=self.field.gen()
+          
+        if ((self.q+1)*x0^(self.q)  != 0):
+            return [(x-x0),True]
+        if (self.q*y0^(2*self.q-2)+1 != 0):
+            return [(y-y0),False]   
+       
+       
     def error_values(self,error_loc):
         """
         EXAMPLES::
-            sage: her = Hermite(2,3) 
-            sage: her.error_values(1234) # not tested
-            got:  [[5, a, a^2], [6, a^2, a]]
+            sage: her = Hermite(2,3)
+            sage: her.error_values(1234)
+            got:  [[5, a, a + 1], [6, a + 1, a]]
+            uniformizer:  x + a
+            uniformizer:  x + a + 1
+
 
 
 
@@ -183,46 +211,56 @@ class Hermite(object):
         a=self.field.gen()
         error_loc = [[5,a,a^2],[6,a^2,a]]
         print 'got: ', error_loc
-        
+       
+
+     
+       
         Ring.<x,y>=self.ring
+        univariate_ring.<z>=self.field[]
         S=x*y+x*x+y
         LL=y+x+1
+        LL=(1/a^2)*(x+a)
         R=x^2+y+1
-        
+       
         u=[[0,0]]*len(self.points)
         e=[0]*len(self.points)
 
-        print e
-        print error_loc[0][0]
+
         list= [error_loc[j][0] for j in range(len(error_loc))]
         for i in  range(len(error_loc)):
-            # #u[error_loc[i][0]][0] = y^(self.q)+y-(error_loc[i][1])^((self.q)+1)
-            # #u[error_loc[i][0]][1] = (x-error_loc[i][1])*(y-error_loc[i][2])
-            # print 'Position: ', error_loc[i][0]
-             f=R/error_loc[i][2]^(self.b_m+1)
-             print 'f= ', f
-             print 'f P', f(error_loc[i][1],error_loc[i][2])
-             print 'f R', R(error_loc[i][1],error_loc[i][2])
-             print error_loc[i]
-             print e
-             g=(x-error_loc[i][1])/LL
-             print 'LL(x): ', LL(x,error_loc[i][2])
-             print '(x-alph)/LL: ', (x-error_loc[i][1])/LL
-             gg=g(x,error_loc[i][2])
-             
-             print 'gg: ', gg
-             e[list[i]]=f(error_loc[i][1],error_loc[i][2])*gg
-             print e
-             print R(error_loc[i][1],error_loc[i][2])
-        #print u
-        print e
-        
+            t=self.uniformizer(error_loc[i][1],error_loc[i][2])[0]
+            x_is_uniformizer=self.uniformizer(error_loc[i][1],error_loc[i][2])[1]
+            print 'uniformizer: ',t
+            uring.<t>=self.field[[]]
+            Hring.<H>=uring[]    
+ 
+            print self.hermite_curve
+            f=self.hermite_curve
+            # Fall unterscheidung fehlt noch nach x_is_uniformizer
+            F=f(0+error_loc[i][1],z+error_loc[i][2])
+            g= f(t+error_loc[i][1],H+error_loc[i][2])
+            rk=0
+            g_prime=g.derivative()
+            for k in range(4):
+                  rk=rk-g(rk)/(g_prime(rk))
+                  #print 'g(rk): ' ,g(rk), 'rk: ', rk, ' Schritt: ', k
+            #univariate_ring.<z>=self.field[]
+            Quo=t/LL(t+error_loc[i][1],rk+error_loc[i][2])
+            Qu=Quo(0)
+            print 'Pt: ', error_loc[i]
+            print 'Quo: ', Quo
+            print'y hoch: ', (error_loc[i][2])^(self.b_m+1)
+            print'R von: ', R(error_loc[i][1],error_loc[i][2])
+            print 'ERG: ',-R(error_loc[i][1],error_loc[i][2])/(error_loc[i][2])^(self.b_m+1)*Qu
+            #assert False
+        #print e
+       
 
-        
-        
-        
-        
-        
+       
+       
+       
+       
+       
 
     def find_codeword(self,r):
         """
