@@ -170,12 +170,24 @@ class Hermite(object):
 
         return self.phi_her(w)
         
+  def uniformizer(self,x0,y0):
+        a=self.field.gen()
+           
+        if ((self.q+1)*x0^(self.q)  != 0):
+            return [(x-x0),True]
+        if (self.q*y0^(2*self.q-2)+1 != 0):
+            return [(y-y0),False]    
+        
+        
     def error_values(self,error_loc):
         """
         EXAMPLES::
             sage: her = Hermite(2,3) 
-            sage: her.error_values(1234) # not tested
-            got:  [[5, a, a^2], [6, a^2, a]]
+            sage: her.error_values(1234) 
+            got:  [[5, a, a + 1], [6, a + 1, a]]
+            uniformizer:  x + a
+            uniformizer:  x + a + 1
+
 
 
 
@@ -184,40 +196,52 @@ class Hermite(object):
         error_loc = [[5,a,a^2],[6,a^2,a]]
         print 'got: ', error_loc
         
+
+      
+        
         Ring.<x,y>=self.ring
+        univariate_ring.<z>=self.field[]
         S=x*y+x*x+y
         LL=y+x+1
+        LL=(1/a^2)*(x+a)
         R=x^2+y+1
         
         u=[[0,0]]*len(self.points)
         e=[0]*len(self.points)
 
-        print e
-        print error_loc[0][0]
+
         list= [error_loc[j][0] for j in range(len(error_loc))]
         for i in  range(len(error_loc)):
-            # #u[error_loc[i][0]][0] = y^(self.q)+y-(error_loc[i][1])^((self.q)+1)
-            # #u[error_loc[i][0]][1] = (x-error_loc[i][1])*(y-error_loc[i][2])
-            # print 'Position: ', error_loc[i][0]
-             f=R/error_loc[i][2]^(self.b_m+1)
-             print 'f= ', f
-             print 'f P', f(error_loc[i][1],error_loc[i][2])
-             print 'f R', R(error_loc[i][1],error_loc[i][2])
-             print error_loc[i]
-             print e
-             g=(x-error_loc[i][1])/LL
-             print 'LL(x): ', LL(x,error_loc[i][2])
-             print '(x-alph)/LL: ', (x-error_loc[i][1])/LL
-             gg=g(x,error_loc[i][2])
-             
-             print 'gg: ', gg
-             e[list[i]]=f(error_loc[i][1],error_loc[i][2])*gg
-             print e
-             print R(error_loc[i][1],error_loc[i][2])
-        #print u
-        print e
+            t=self.uniformizer(error_loc[i][1],error_loc[i][2])[0]
+            x_is_uniformizer=self.uniformizer(error_loc[i][1],error_loc[i][2])[1]
+            print 'uniformizer: ',t
+            uring.<t>=self.field[[]]
+            Hring.<H>=uring[]     
+ 
+            print self.hermite_curve
+            f=self.hermite_curve
+            # Fall unterscheidung fehlt noch nach x_is_uniformizer
+            F=f(0+error_loc[i][1],z+error_loc[i][2])
+            g= f(t+error_loc[i][1],H+error_loc[i][2])
+            rk=0
+            g_prime=g.derivative()
+            for k in range(4):
+                  rk=rk-g(rk)/(g_prime(rk))
+                  #print 'g(rk): ' ,g(rk), 'rk: ', rk, ' Schritt: ', k
+            #univariate_ring.<z>=self.field[]
+            Quo=t/LL(t+error_loc[i][1],rk+error_loc[i][2])
+            Qu=Quo(0)
+            print 'Pt: ', error_loc[i]
+            print 'Quo: ', Quo
+            print'y hoch: ', (error_loc[i][2])^(self.b_m+1)
+            print'R von: ', R(error_loc[i][1],error_loc[i][2])
+            print 'ERG: ',-R(error_loc[i][1],error_loc[i][2])/(error_loc[i][2])^(self.b_m+1)*Qu
+            #assert False
+        #print e
         
 
+        
+        
         
         
         
