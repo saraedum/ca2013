@@ -196,7 +196,7 @@ class Hermite(object):
             sage: a=her.field.gen()
             sage: her.error_values([[5,a,a^2],[6,a^2,a]]) 
             [5, 6]
-            [0, 0, 0, 0, 0, a, a + 1, 0]
+            [0, 0, 0, 0, 0, 1, 1, 0]
 
         """
         a=self.field.gen()
@@ -205,7 +205,7 @@ class Hermite(object):
         # noch zu übergeben
         S=x*y+x*x+y
         LL=y+x+1
-        R=x^2+y+1
+        R=x^2
         
 
         e=[0]*len(self.points)
