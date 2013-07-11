@@ -57,8 +57,8 @@ class Hermite(object):
         self.hermite_curve=x^(self.q+1)-y^(self.q)-y
         self.points=[[c,d] for c in field for d in field if self.hermite_curve(c,d)==0] 
         assert self.n==len(self.points)
-        self.G=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.k+1)) if self.element_exists(i)])
-        self.H=matrix([[self.create_element(i)(self.points[j]) for j in range(self.n)] for i in range(self.ord_element(self.n-self.k+1)) if self.element_exists(i)])
+        self.G=matrix([[self.basis_polynomial(i)(self.points[j]) for j in range(self.n)] for i in range(self.k)])
+        self.H=matrix([[self.basis_polynomial(i)(self.points[j]) for j in range(self.n)] for i in range(self.n-self.k)])
         self.phi=self.W.hom(self.G)
         assert self.G*self.H.transpose()==0
         self.C=self.V.subspace_with_basis(self.G)
@@ -104,6 +104,16 @@ class Hermite(object):
             return R.zero()
 
     def basis_polynomial(self,i):
+        """
+        EXAMPLES::
+            sage: her=Hermite(2,3)
+            sage: her.basis_polynomial(0)
+            1
+            sage: her.basis_polynomial(1)
+            x
+            sage: her.basis_polynomial(2)
+            y
+        """
         assert type(i) is sage.rings.integer.Integer or i in ZZ
         return self.create_element(self.ord_element(i))
 
@@ -133,7 +143,7 @@ class Hermite(object):
         EXAMPLES::
             sage: her=Hermite(3,5)
             sage: her.ord_element(4)
-            6
+            7
         """
         assert type(n) is sage.rings.integer.Integer or n in ZZ
         ret=0
@@ -142,10 +152,10 @@ class Hermite(object):
             return 0
         else:
             while i<n:
-                if self.element_exists(ret):
+                if self.element_exists(ret+1):
                     i+=1
                 ret+=1
-            return ret-1
+            return ret
 
     def L(self,j):
         """
@@ -161,6 +171,9 @@ class Hermite(object):
         """
         EXAMPLES::
             sage: her=Hermite(2,3)
+            sage: r=her.V([0,0,0,1,1,0,0,0])
+            sage: her.H*r
+            (0, 1, 1, 1, 0)
         """
         assert r in self.V
         return self.H*r
@@ -169,6 +182,9 @@ class Hermite(object):
         """
         EXAMPLES::
             sage: her=Hermite(2,3)
+            sage: r=her.V([0,0,0,1,1,0,0,0])
+            sage: her.syndrome_polynomial(r)
+            x^2 + x*y + y
         """
         s=self.syndrome(r)
         R.<x,y>=self.ring
