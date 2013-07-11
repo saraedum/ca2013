@@ -39,6 +39,7 @@ class Hermite(object):
         self.m_perp=self.n-self.m+q^2-q-2 
         self.k_perp=self.n-self.k    # dimension of L(m_perp P)
         self.d_ast=self.n-self.m    # virtual minimal Distance
+        self.t=floor((self.d_ast-1)/2)
         self.a_m=q
         self.basis_poly = [x^a*y^b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m )  ]     # S. 19 
         basis_poly_powers_of_y = [b for a in range(q+1) for b in range(m) if ((q*a+(q+1)*b) <= self.m_perp )]   # S. 23  
@@ -102,6 +103,10 @@ class Hermite(object):
         else:
             return R.zero()
 
+    def basis_polynomial(self,i):
+        assert type(i) is sage.rings.integer.Integer or i in ZZ
+        return self.create_element(self.ord_element(i))
+
     def element_exists(self,n):
         """
         EXAMPLES::
@@ -133,11 +138,14 @@ class Hermite(object):
         assert type(n) is sage.rings.integer.Integer or n in ZZ
         ret=0
         i=0
-        while i<n:
-            if self.element_exists(ret):
-                i+=1
-            ret+=1
-        return ret-1
+        if n==0:
+            return 0
+        else:
+            while i<n:
+                if self.element_exists(ret):
+                    i+=1
+                ret+=1
+            return ret-1
 
     def L(self,j):
         """
@@ -148,6 +156,23 @@ class Hermite(object):
         """
         assert type(j) is sage.rings.integer.Integer or j in ZZ
         return [self.create_element(i) for i in range(j+1) if self.element_exists(i)]
+
+    def syndrome(self,r):
+        """
+        EXAMPLES::
+            sage: her=Hermite(2,3)
+        """
+        assert r in self.V
+        return self.H*r
+
+    def syndrome_polynomial(self,r):
+        """
+        EXAMPLES::
+            sage: her=Hermite(2,3)
+        """
+        s=self.syndrome(r)
+        R.<x,y>=self.ring
+        return sum([s[i]*x**self.a_m*y**self.b_m/self.basis_polynomial(i) for i in range(self.k_perp)])
 
     def __repr__(self):
         """
