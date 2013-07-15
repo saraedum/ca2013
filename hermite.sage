@@ -211,6 +211,21 @@ class Hermite(object):
 
         return self.phi_her(w)
         
+    def error_locations(self,LL):
+        """
+        EXAMPLES::
+            sage: her = Hermite(2,3) 
+            sage: field.<a>=GF(2^2)
+            sage: R.<x,y>=field[]
+            sage: her.error_locations(y+x+1) 
+            [[1, 0, 1], [3, a, a + 1], [4, a + 1, a]]
+
+        """     
+        a=self.field.gen()
+        return[[P[0],P[1][0],P[1][1]] for  P in enumerate(self.points) if LL(P[1][0],P[1][1])==0 ]
+
+        
+        
     def uniformizer(self,x0,y0):
         """
         EXAMPLES::
@@ -223,56 +238,64 @@ class Hermite(object):
 
         """
         a=self.field.gen()
-           
+        y=var('y')
+
         if ((self.q+1)*x0^(self.q)  != 0):
-            return [(x-x0),True]
+            return [x-x0,True]
         if (self.q*y0^(2*self.q-2)+1 != 0):
-            return [(y-y0),False]    
+            return [y-y0,False]    
         
         
-    def error_values(self,error_loc):
+    def error_values(self,LL,R,S):
         """
         EXAMPLES::
             sage: her = Hermite(2,3) 
-            sage: a=her.field.gen()
-            sage: her.error_values([[5,a,a^2],[6,a^2,a]]) 
-            [5, 6]
-            [0, 0, 0, 0, 0, 1, 1, 0]
+            sage: field.<a>=GF(2^2)
+            sage: R.<x,y>=field[]
+            sage: her.error_values(y+x+1,x*x,x*y+x*x+y) 
+            [0, 0, 0, 1, 1, 0, 0, 0]
 
         """
         a=self.field.gen()
         Ring.<x,y>=self.ring
 
-        # noch zu übergeben
-        S=x*y+x*x+y
-        LL=y+x+1
-        R=x^2
-        
-
+       
+        error_loc=self.error_locations(LL)
         e=[0]*len(self.points)
 
 
         list= [error_loc[j][0] for j in range(len(error_loc))]
-        print list
         for i in  range(len(error_loc)):
+            if R(error_loc[i][1],error_loc[i][2]) == 0:
+                e[list[i]]=0
+                continue
+            if (error_loc[i][1]==0) and(error_loc[i][2]) == 0:
+                continue
+            
             [t,x_is_uniformizer]=self.uniformizer(error_loc[i][1],error_loc[i][2])
             uring.<t>=self.field[[]]
             Hring.<H>=uring[]     
 
-            # Fallunterscheidung fehlt noch nach x_is_uniformizer = True oder False
-            assert x_is_uniformizer
-            g=self.hermite_curve(t+error_loc[i][1],H+error_loc[i][2])
+            
+            if x_is_uniformizer:
+                g=self.hermite_curve(t+error_loc[i][1],H+error_loc[i][2])
+            else:
+                g=self.hermite_curve(H+error_loc[i][1],t+error_loc[i][2])
             rk=0
             g_prime=diff(g)
+            
             for k in range(4):
                   rk=rk-g(rk)/(g_prime(rk))
-
-            Quo=t/LL(t+error_loc[i][1],rk+error_loc[i][2])
+            if x_is_uniformizer:
+                Quo=t/LL(t+error_loc[i][1],rk+error_loc[i][2])
+            else:
+                Quo=rk/LL(rk+error_loc[i][1],t+error_loc[i][2])
             
-            # Quo(0) sollte für P5(a,a^2)den Wert  1/a^2=a liefern laut Bsp. auf Seite 27
+            
             e[list[i]]=-R(error_loc[i][1],error_loc[i][2])/((error_loc[i][2])^(self.b_m+1))*Quo(0)
 
 
+        e[0]=S.coefficient(x^(self.a_m)*y^(self.b_m))-sum(e)
         return e
 
         
