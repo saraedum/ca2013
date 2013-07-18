@@ -188,7 +188,80 @@ class Hermite(object):
         """
         s=self.syndrome(r)
         R.<x,y>=self.ring
-        return sum([s[i]*x**self.a_m*y**self.b_m/self.basis_polynomial(i) for i in range(self.k_perp)])
+        return sum([s[i]*x**self.a_m*y**self.b_m//self.basis_polynomial(i) for i in range(self.k_perp)])
+
+    def Division_Algorithm(self,r,mu):
+        """
+        EXAMPLES::
+            sage: her=Hermite(4,51)
+        """
+        #Sieh Skript Seite 27 Paragraf 3.5
+        Ring.<x,y>=self.ring
+        S=Ring(self.syndrome_polynomial(r))
+        #Schritt 1
+        f=y^(self.b_m+1)
+        R_0=[S%f]
+        gamma=[[self.ring.zero() for j in range(mu+1)] for k in range(mu+1)]
+        Delta=[self.ring.zero() for j in range(mu+1)]
+        Delta[0]=Ring.one()
+        #Schritt 2
+        for i in range(1,mu+1):
+            phi_i=self.basis_polynomial(i)
+            if phi_i.exponents()[0][1]>0:
+                psi=y
+            else:
+                psi=x
+            nu=[self.basis_polynomial(k) for k in range(i+1)].index(phi_i/psi)
+            theta=self.reduce(psi*R_0[nu])%f
+            R=theta
+            for j in range(i):
+                gamma[i][i-j-1],R=self.Euclidian(R,R_0[i-j-1],i,i-j-1)
+            R_0.append(self.reduce(theta-sum([gamma[i][j]*R_0[j] for j in range(i)])))
+            Delta[i]=psi*Delta[nu]-sum([gamma[i][j]*Delta[j] for j in range(i)])
+        #Schritt 3
+        if self.ord(R_0[mu])-self.ord(Delta[mu])<=self.ell:
+            Lambda=Delta[mu]+sum([gamma[mu][j]*Delta[j] for j in range(mu+1) if self.ord(R_0[j])-self.ord(Delta[mu])<self.ell])
+            R=R_0[mu]+sum([gamma[mu][j]*R_0[j] for j in range(mu+1) if self.ord(R_0[j])-self.ord(Delta[mu])<self.ell])
+            return Lambda,R
+        else:
+            return self.Division_Algorithm(r,mu+1)
+    
+    def Euclidian(self,A,B,i,j):
+        #In Schritt 2 "theta durch R_i-1,...,R_0 in dieser Ordnung teilen"
+        if A==0:
+            return self.ring.zero(),self.ring.zero()
+        A_monos=A.monomials()
+        B_monos=B.monomials()
+        #Führende Monome holen
+        a=A_monos[[self.ord(mono) for mono in A_monos].index(max([self.ord(mono) for mono in A_monos]))]
+        a=A.monomial_coefficient(a)*a
+        b=B_monos[[self.ord(mono) for mono in B_monos].index(max([self.ord(mono) for mono in B_monos]))]
+        b=B.monomial_coefficient(b)*b
+        #abgewandelter euklidischer Algorithmus mit Zusatzbedingung. Siehe Gleichung (16)
+        if not b.divides(a):
+            gamma,R=self.Euclidian(A-a,B,i,j)
+            R+=a
+            return gamma,R
+        else:
+            c=a//b
+            if self.ord(c)<self.ord(self.basis_polynomial(i))-self.ord(self.basis_polynomial(j)):
+                A-=B*c
+                gamma, R=self.Euclidian(A,B,i,j)
+                gamma+=c
+                return gamma,R
+            else:
+                gamma,R=self.Euclidian(A-a,B,i,j)
+                R+=a
+                return gamma,R
+
+    def reduce(self,f):
+        #Magic made by Julian
+        R.<x,y>=self.ring
+        g=x^(self.q+1)-y^self.q-y
+        S.<y>=R.base_ring()[]
+        T.<x>=S[]
+        U=T.quo(g)
+        return R(U(f).lift()(R.gen(0)))
 
     def __repr__(self):
         """
@@ -230,7 +303,7 @@ class Hermite(object):
             return [(y-y0),False]    
         
         
-    def error_values(self,error_loc):
+    def error_values(self,error_loc,R,LL,S):
         """
         EXAMPLES::
             sage: her = Hermite(2,3) 
@@ -244,9 +317,9 @@ class Hermite(object):
         Ring.<x,y>=self.ring
 
         # noch zu Ã¼bergeben
-        S=x*y+x*x+y
-        LL=y+x+1
-        R=x^2
+        #S=x*y+x*x+y
+        #LL=y+x+1
+        #R=x^2
         
 
         e=[0]*len(self.points)
