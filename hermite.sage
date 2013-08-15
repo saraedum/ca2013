@@ -460,3 +460,16 @@ class Hermite(object):
             ret[p] = self.V.base_field().random_element()
         return ret
 
+    def test(self, max_noise):
+        r"""
+        EXAMPLES::
+
+            sage: her = Hermite(3,5)
+            sage: her.test(1)
+
+        """
+        msg = self.W.random_element()
+        code = self.encode(msg)
+        code_ = code+self.noise(max_noise)
+        msg_ = self.decode(code_)
+        assert msg == msg_
