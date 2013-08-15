@@ -426,7 +426,7 @@ class Hermite(object):
         #    if (c-r).hamming_weight() < self.t+1:
         #        return c
         Ring.<x,y>=self.ring
-        LL,R=self.Division_Algorithm(r,0)
+        LL,R=self.division_algorithm(r,0)
         S=self.syndrome_polynomial(r)
         e=self.error_values(LL,R,S)
         c=r-e
@@ -439,7 +439,7 @@ class Hermite(object):
             sage: TODO
 
         """
-        return column_matrix(self.G)\self.find_codeword(her.find_codeword(r))
+        return column_matrix(self.G)\self.find_codeword(self.find_codeword(r))
 
     def noise(self, max_amount):
         r"""
@@ -448,8 +448,8 @@ class Hermite(object):
             sage: her = Hermite(3,5)
             sage: her.noise(0)
             (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-            sage: her.noise(3)
-            (0, 2*a + 2, 0, a + 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0) # random output
+            sage: her.noise(3) # random output
+            (0, 2*a + 2, 0, a + 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0)
 
         """
         pos = range(self.V.dimension())
