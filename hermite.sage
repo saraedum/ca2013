@@ -237,15 +237,18 @@ class Hermite(object):
             R=theta
             for j in range(i):
                 gamma[i][i-j-1],R=self.euclidian(R,R_0[i-j-1],i,i-j-1)
+                assert self.ord(self.basis_polynomial(j)) + self.ord(gamma[i][j]) < self.ord(self.basis_polynomial(i))
             R_0.append(self.reduce(theta-sum([gamma[i][j]*R_0[j] for j in range(i)])))
-            Delta[i]=psi*Delta[nu]-sum([gamma[i][j]*Delta[j] for j in range(i)])
+            assert sum([gamma[i][j]*R_0[j]]) + R_0[i] == theta
+            Delta[i]=psi*Delta[nu]-sum([gamma[i][j]*Delta[i] for j in range(i)])
+            assert self.ord(Delta[i] - self.basis_polynomial(i)) < self.ord(Delta[i])
+            assert (self.reduce(Delta[i] * S - R_0[i])%f).is_zero()
         #Schritt 3
-        if self.ord(R_0[mu])-self.ord(Delta[mu])<=self.ell:
-            Lambda=Delta[mu]+sum([gamma[mu][j]*Delta[j] for j in range(mu+1) if self.ord(R_0[j])-self.ord(Delta[mu])<self.ell])
-            R=R_0[mu]+sum([gamma[mu][j]*R_0[j] for j in range(mu+1) if self.ord(R_0[j])-self.ord(Delta[mu])<self.ell])
-            return Lambda,R
-        else:
-            return self.division_algorithm(r,mu+1)
+        Lambda=Delta[mu]+sum([gamma[mu][j]*Delta[j] for j in range(mu+1) if self.ord(R_0[j])-self.ord(Delta[mu])<self.ell])
+        R=R_0[mu]+sum([gamma[mu][j]*R_0[j] for j in range(mu+1) if self.ord(R_0[j])-self.ord(Delta[mu])<self.ell])
+        if (self.reduce(Lambda * S - R)%f).is_zero():
+            return Lambda, R
+        return self.division_algorithm(r,mu+1)
     
     def euclidian(self,A,B,i,j):
         """
