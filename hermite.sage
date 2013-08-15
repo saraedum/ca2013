@@ -5,6 +5,7 @@ class Hermite(object):
     def __init__(self,q,m):
         """
         EXAMPLES::
+
             sage: her = Hermite(4,51) 
             sage: her.n                                                                                         
             64
@@ -66,11 +67,13 @@ class Hermite(object):
     def ord(self,f):
         """
         EXAMPLES::
+
             sage: her=Hermite(3,5)
             sage: R.<x,y>=her.ring
             sage: f=x^2*y
             sage: her.ord(f)
             10
+
         """
         exps=f.exponents()
         ret=0;
@@ -81,11 +84,13 @@ class Hermite(object):
     def create_element(self,n):
         """
         EXAMPLES::
+
             sage: her=Hermite(3,5)
             sage: her.create_element(3)
             x
             sage: her.create_element(17)
             x^3*y^2
+
         """
         assert type(n) is sage.rings.integer.Integer or n in ZZ
         R.<x,y>=self.ring
@@ -106,6 +111,7 @@ class Hermite(object):
     def basis_polynomial(self,i):
         """
         EXAMPLES::
+
             sage: her=Hermite(2,3)
             sage: her.basis_polynomial(0)
             1
@@ -113,6 +119,7 @@ class Hermite(object):
             x
             sage: her.basis_polynomial(2)
             y
+
         """
         assert type(i) is sage.rings.integer.Integer or i in ZZ
         return self.create_element(self.ord_element(i))
@@ -120,11 +127,13 @@ class Hermite(object):
     def element_exists(self,n):
         """
         EXAMPLES::
+
             sage: her=Hermite(3,5)
             sage: her.element_exists(2)
             False
             sage: her.element_exists(13)
             True
+
         """
         assert type(n) is sage.rings.integer.Integer or n in ZZ
         if n>=(self.q*(self.q+1)):
@@ -141,9 +150,11 @@ class Hermite(object):
     def ord_element(self,n):
         """
         EXAMPLES::
+
             sage: her=Hermite(3,5)
             sage: her.ord_element(4)
             7
+
         """
         assert type(n) is sage.rings.integer.Integer or n in ZZ
         ret=0
@@ -160,9 +171,11 @@ class Hermite(object):
     def L(self,j):
         """
         EXAMPLES::
+
             sage: her=Hermite(3,5)
             sage: her.L(13)
             [1, x, y, x^2, x*y, y^2, x^3, x^2*y, x*y^2, y^3, x^3*y]
+
         """
         assert type(j) is sage.rings.integer.Integer or j in ZZ
         return [self.create_element(i) for i in range(j+1) if self.element_exists(i)]
@@ -170,10 +183,13 @@ class Hermite(object):
     def syndrome(self,r):
         """
         EXAMPLES::
+
             sage: her=Hermite(2,3)
             sage: r=her.V([0,0,0,1,1,0,0,0])
             sage: her.H*r
             (0, 1, 1, 1, 0)
+            sage: TODO
+
         """
         assert r in self.V
         return self.H*r
@@ -181,19 +197,24 @@ class Hermite(object):
     def syndrome_polynomial(self,r):
         """
         EXAMPLES::
+
             sage: her=Hermite(2,3)
             sage: r=her.V([0,0,0,1,1,0,0,0])
             sage: her.syndrome_polynomial(r)
             x^2 + x*y + y
+            
         """
         s=self.syndrome(r)
         R.<x,y>=self.ring
         return sum([s[i]*x**self.a_m*y**self.b_m//self.basis_polynomial(i) for i in range(self.k_perp)])
 
-    def Division_Algorithm(self,r,mu):
+    def division_algorithm(self,r,mu):
         """
         EXAMPLES::
+
             sage: her=Hermite(4,51)
+            sage: TODO
+
         """
         #Sieh Skript Seite 27 Paragraf 3.5
         Ring.<x,y>=self.ring
@@ -215,7 +236,7 @@ class Hermite(object):
             theta=self.reduce(psi*R_0[nu])%f
             R=theta
             for j in range(i):
-                gamma[i][i-j-1],R=self.Euclidian(R,R_0[i-j-1],i,i-j-1)
+                gamma[i][i-j-1],R=self.euclidian(R,R_0[i-j-1],i,i-j-1)
             R_0.append(self.reduce(theta-sum([gamma[i][j]*R_0[j] for j in range(i)])))
             Delta[i]=psi*Delta[nu]-sum([gamma[i][j]*Delta[j] for j in range(i)])
         #Schritt 3
@@ -224,9 +245,16 @@ class Hermite(object):
             R=R_0[mu]+sum([gamma[mu][j]*R_0[j] for j in range(mu+1) if self.ord(R_0[j])-self.ord(Delta[mu])<self.ell])
             return Lambda,R
         else:
-            return self.Division_Algorithm(r,mu+1)
+            return self.division_algorithm(r,mu+1)
     
-    def Euclidian(self,A,B,i,j):
+    def euclidian(self,A,B,i,j):
+        """
+        
+        EXAMPLES::
+
+                sage: TODO
+
+        """
         #In Schritt 2 "theta durch R_i-1,...,R_0 in dieser Ordnung teilen"
         if A==0:
             return self.ring.zero(),self.ring.zero()
@@ -239,22 +267,36 @@ class Hermite(object):
         b=B.monomial_coefficient(b)*b
         #abgewandelter euklidischer Algorithmus mit Zusatzbedingung. Siehe Gleichung (16)
         if not b.divides(a):
-            gamma,R=self.Euclidian(A-a,B,i,j)
+            gamma,R=self.euclidian(A-a,B,i,j)
             R+=a
             return gamma,R
         else:
             c=a//b
             if self.ord(c)<self.ord(self.basis_polynomial(i))-self.ord(self.basis_polynomial(j)):
                 A-=B*c
-                gamma, R=self.Euclidian(A,B,i,j)
+                gamma, R=self.euclidian(A,B,i,j)
                 gamma+=c
                 return gamma,R
             else:
-                gamma,R=self.Euclidian(A-a,B,i,j)
+                gamma,R=self.euclidian(A-a,B,i,j)
                 R+=a
                 return gamma,R
 
     def reduce(self,f):
+        r"""
+        Reduce ``f`` modulo the equation `x^(q+1) = y^q + y` such that it does
+        not contain powers of `x` exceeding `q`.
+
+        EXAMPLES::
+
+            sage: her = Hermite(3,5)
+            sage: R.<x,y> = her.ring
+            sage: her.reduce(x^10)
+            x^2*y^6 - x^2*y^4 + x^2*y^2
+            sage: her.reduce(y^10)
+            y^10
+                
+        """
         #Magic made by Julian
         R.<x,y>=self.ring
         g=x^(self.q+1)-y^self.q-y
@@ -270,6 +312,7 @@ class Hermite(object):
             sage: her = Hermite(3,5)
             sage: her 
             (3,5)-Hermite-Code over Finite Field in a of size 3^2
+
         """
         return "("+str(self.q)+","+str(self.m)+")-Hermite-Code"+" over "+str(self.field)
 
@@ -280,6 +323,7 @@ class Hermite(object):
             sage: her = Hermite(3,5)
             sage: her.phi_her(her.W([0,0,1])) # not tested
             (0, a + 1, 2*a + 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2)
+
         """
 
         return self.phi(w)
@@ -287,6 +331,7 @@ class Hermite(object):
     def error_locations(self,LL):
         """
         EXAMPLES::
+
             sage: her = Hermite(2,3) 
             sage: field.<a>=GF(2^2)
             sage: R.<x,y>=field[]
@@ -297,11 +342,10 @@ class Hermite(object):
         a=self.field.gen()
         return[[P[0],P[1][0],P[1][1]] for  P in enumerate(self.points) if LL(P[1][0],P[1][1])==0 ]
 
-        
-        
     def uniformizer(self,x0,y0):
         """
         EXAMPLES::
+
             sage: her = Hermite(2,3) 
             sage: a=her.field.gen()
             sage: her.uniformizer(1,1)
@@ -318,10 +362,10 @@ class Hermite(object):
         if (self.q*y0^(2*self.q-2)+1 != 0):
             return [y-y0,False]    
         
-        
     def error_values(self,LL,R,S):
         """
         EXAMPLES::
+
             sage: her = Hermite(2,3) 
             sage: field.<a>=GF(2^2)
             sage: R.<x,y>=field[]
@@ -370,18 +414,12 @@ class Hermite(object):
         e[0]=S.coefficient(x^(self.a_m)*y^(self.b_m))-sum(e)
         return self.V(e)
 
-        
-        
-        
-        
-        
-        
-        
-
     def find_codeword(self,r):
         """
         EXAMPLES::
 
+            sage: TODO
+            
         """
 
         #for c in self.C:
@@ -399,9 +437,7 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: l.<a> = GF(16) # not tested
-            sage: her = Hermite(5, 3, l,[a^(3*i) for i in range(5)]) # not tested
-            sage: her.decode(her.V([a,a^13,a^11,a^14,a^7])) # not tested
-            (1, 0, 1)
+            sage: TODO
+
         """
         return column_matrix(self.G)\self.find_codeword(her.find_codeword(r))
