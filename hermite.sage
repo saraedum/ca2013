@@ -398,9 +398,9 @@ class Hermite(object):
                 g=self.hermite_curve(H+error_loc[i][1],t+error_loc[i][2])
             rk=0
             g_prime=diff(g)
-            
-            for k in range(4):
-                  rk=rk-g(rk)/(g_prime(rk))
+            if (g_prime(rk) != 0): 
+               for k in range(4):
+                     rk=rk-g(rk)/(g_prime(rk))
             if x_is_uniformizer:
                 Quo=t/LL(t+error_loc[i][1],rk+error_loc[i][2])
             else:
@@ -439,7 +439,7 @@ class Hermite(object):
             sage: TODO
 
         """
-        return column_matrix(self.G)\self.find_codeword(self.find_codeword(r))
+        return self.G.transpose()\self.find_codeword(r)
 
     def noise(self, max_amount):
         r"""
