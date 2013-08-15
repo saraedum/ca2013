@@ -297,8 +297,6 @@ class Hermite(object):
         a=self.field.gen()
         return[[P[0],P[1][0],P[1][1]] for  P in enumerate(self.points) if LL(P[1][0],P[1][1])==0 ]
 
-        
-        
     def uniformizer(self,x0,y0):
         """
         EXAMPLES::
@@ -317,7 +315,6 @@ class Hermite(object):
             return [x-x0,True]
         if (self.q*y0^(2*self.q-2)+1 != 0):
             return [y-y0,False]    
-        
         
     def error_values(self,LL,R,S):
         """
@@ -371,25 +368,12 @@ class Hermite(object):
         e[0]=S.coefficient(x^(self.a_m)*y^(self.b_m))-sum(e)
         return e
 
-        
-        
-        
-        
-        
-        
-        
-
     def find_codeword(self,r):
         """
         EXAMPLES::
 
         """
-
-        for c in self.C:
-
-            if (c-r).hamming_weight() < self.t+1:
-                return c
-
+        raise NotImplementedError
 
     def decode(self,r):
         """
