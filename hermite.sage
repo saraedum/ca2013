@@ -417,7 +417,12 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: TODO
+            sage: her = Hermite(3,5)
+            sage: a = her.field.gen()
+            sage: code_ = her.V((0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, a + 1, 0, 0, 0, 0, 0, 0, 0))
+            sage: code = her.find_codeword(code_)
+            sage: code.is_zero()
+            True
             
         """
         Ring.<x,y>=self.ring
