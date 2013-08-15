@@ -282,7 +282,7 @@ class Hermite(object):
             (0, a + 1, 2*a + 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2)
         """
 
-        return self.phi_her(w)
+        return self.phi(w)
         
     def error_locations(self,LL):
         """
@@ -332,7 +332,6 @@ class Hermite(object):
         a=self.field.gen()
         Ring.<x,y>=self.ring
 
-       
         error_loc=self.error_locations(LL)
         e=[0]*len(self.points)
 
@@ -369,7 +368,7 @@ class Hermite(object):
 
 
         e[0]=S.coefficient(x^(self.a_m)*y^(self.b_m))-sum(e)
-        return e
+        return self.V(e)
 
         
         
@@ -385,11 +384,16 @@ class Hermite(object):
 
         """
 
-        for c in self.C:
-
-            if (c-r).hamming_weight() < self.t+1:
-                return c
-
+        #for c in self.C:
+        #
+        #    if (c-r).hamming_weight() < self.t+1:
+        #        return c
+        Ring.<x,y>=self.ring
+        LL,R=self.Division_Algorithm(r,0)
+        S=self.syndrome_polynomial(r)
+        e=self.error_values(LL,R,S)
+        c=r-e
+        return c
 
     def decode(self,r):
         """
