@@ -381,11 +381,10 @@ class Hermite(object):
         error_loc=self.error_locations(LL)
         e=[0]*len(self.points)
 
-
-        list= [error_loc[j][0] for j in range(len(error_loc))]
+        lst= [error_loc[j][0] for j in range(len(error_loc))]
         for i in  range(len(error_loc)):
             if R(error_loc[i][1],error_loc[i][2]) == 0:
-                e[list[i]]=0
+                e[lst[i]]=0
                 continue
             if (error_loc[i][1]==0) and(error_loc[i][2]) == 0:
                 continue
@@ -410,7 +409,7 @@ class Hermite(object):
                 Quo=rk/LL(rk+error_loc[i][1],t+error_loc[i][2])
             
             
-            e[list[i]]=-R(error_loc[i][1],error_loc[i][2])/((error_loc[i][2])^(self.b_m+1))*Quo(0)
+            e[lst[i]]=-R(error_loc[i][1],error_loc[i][2])/((error_loc[i][2])^(self.b_m+1))*Quo(0)
 
 
         e[0]=S.coefficient(x^(self.a_m)*y^(self.b_m))-sum(e)
@@ -429,7 +428,7 @@ class Hermite(object):
             
         """
         Ring.<x,y>=self.ring
-        LL,R=self.division_algorithm(r,0)
+        LL,R=self.division_algorithm(r,1)
         S=self.syndrome_polynomial(r)
         e=self.error_values(LL,R,S)
         c=r-e
