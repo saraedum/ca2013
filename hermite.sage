@@ -325,7 +325,6 @@ class Hermite(object):
             (0, a + 1, 2*a + 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2, 2*a, a + 2, 1, a, 2*a + 1, 2)
 
         """
-
         return self.phi(w)
         
     def error_locations(self,LL):
@@ -441,3 +440,23 @@ class Hermite(object):
 
         """
         return column_matrix(self.G)\self.find_codeword(her.find_codeword(r))
+
+    def noise(self, max_amount):
+        r"""
+        EXAMPLES::
+
+            sage: her = Hermite(3,5)
+            sage: her.noise(0)
+            (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            sage: her.noise(3)
+            (0, 2*a + 2, 0, a + 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0) # random output
+
+        """
+        pos = range(self.V.dimension())
+        from random import shuffle
+        shuffle(pos)
+        ret = copy(self.V.zero())
+        for p in pos[:max_amount]:
+            ret[p] = self.V.base_field().random_element()
+        return ret
+
