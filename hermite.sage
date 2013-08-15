@@ -420,11 +420,6 @@ class Hermite(object):
             sage: TODO
             
         """
-
-        #for c in self.C:
-        #
-        #    if (c-r).hamming_weight() < self.t+1:
-        #        return c
         Ring.<x,y>=self.ring
         LL,R=self.division_algorithm(r,0)
         S=self.syndrome_polynomial(r)
