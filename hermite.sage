@@ -188,7 +188,7 @@ class Hermite(object):
             sage: r=her.V([0,0,0,1,1,0,0,0])
             sage: her.H*r
             (0, 1, 1, 1, 0)
-            sage: TODO
+            sage: TODO  # not tested
 
         """
         assert r in self.V
@@ -213,7 +213,7 @@ class Hermite(object):
         EXAMPLES::
 
             sage: her=Hermite(4,51)
-            sage: TODO
+            sage: TODO # not tested
 
         """
         #Sieh Skript Seite 27 Paragraf 3.5
@@ -255,7 +255,7 @@ class Hermite(object):
         
         EXAMPLES::
 
-                sage: TODO
+                sage: TODO  # not tested
 
         """
         #In Schritt 2 "theta durch R_i-1,...,R_0 in dieser Ordnung teilen"
@@ -372,7 +372,7 @@ class Hermite(object):
             sage: field.<a>=GF(2^2)
             sage: R.<x,y>=field[]
             sage: her.error_values(y+x+1,x*x,x*y+x*x+y) 
-            [0, 0, 0, 1, 1, 0, 0, 0]
+            (0, 0, 0, 1, 1, 0, 0, 0)
 
         """
         a=self.field.gen()
@@ -390,9 +390,9 @@ class Hermite(object):
                 continue
             
             [t,x_is_uniformizer]=self.uniformizer(error_loc[i][1],error_loc[i][2])
+
             uring.<t>=self.field[[]]
             Hring.<H>=uring[]     
-
             
             if x_is_uniformizer:
                 g=self.hermite_curve(t+error_loc[i][1],H+error_loc[i][2])
@@ -403,10 +403,12 @@ class Hermite(object):
             if (g_prime(rk) != 0): 
                for k in range(4):
                      rk=rk-g(rk)/(g_prime(rk))
+
+          
             if x_is_uniformizer:
                 Quo=t/LL(t+error_loc[i][1],rk+error_loc[i][2])
             else:
-                Quo=rk/LL(rk+error_loc[i][1],t+error_loc[i][2])
+                Quo=t/LL(rk+error_loc[i][1],t+error_loc[i][2])
             
             
             e[lst[i]]=-R(error_loc[i][1],error_loc[i][2])/((error_loc[i][2])^(self.b_m+1))*Quo(0)
@@ -438,7 +440,7 @@ class Hermite(object):
         """
         EXAMPLES::
 
-            sage: TODO
+            sage: TODO  # not tested
 
         """
         return self.G.transpose()\self.find_codeword(r)
@@ -463,7 +465,7 @@ class Hermite(object):
         return ret
 
     def test(self, max_noise):
-        r"""
+        """"
         EXAMPLES::
 
             sage: her = Hermite(3,5)
